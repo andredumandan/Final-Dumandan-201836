@@ -13,6 +13,7 @@ public class GameCanvas extends JComponent{
     private Color p2 = new Color(255,157,168);
     Player one;
     Player two;
+    Controller c = new Controller();
 
 
     public GameCanvas(){
@@ -26,6 +27,10 @@ public class GameCanvas extends JComponent{
         g2d.fill(bg);
         one.drawSprite(g2d);
         two.drawSprite(g2d);
+        if(c.getProjectiles().size() != 0){
+            c.drawProjectiles(g2d);
+        }
+        
     }
 
     public void createSprites(){
@@ -49,6 +54,10 @@ public class GameCanvas extends JComponent{
         else {
             return one;
         }
+    }
+
+    public Controller getController(){
+        return c;
     }
 
 }

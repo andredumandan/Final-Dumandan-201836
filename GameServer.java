@@ -81,7 +81,7 @@ public class GameServer {
         public ReadFromClient(int playerID, DataInputStream dataIn) {
             this.playerID = playerID;
             this.dataIn = dataIn;
-            System.out.println("RFC " + playerID + "Runnable created");
+            System.out.println("RFC" + playerID + "Runnable created");
         }
 
         @Override
@@ -112,7 +112,7 @@ public class GameServer {
         public WriteToClient(int playerID, DataOutputStream dataOut) {
             this.playerID = playerID;
             this.dataOut = dataOut;
-            System.out.println("WTC " + playerID + "Runnable created");
+            System.out.println("WTC" + playerID + "Runnable created");
         }
 
         @Override

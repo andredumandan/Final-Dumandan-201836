@@ -10,7 +10,6 @@ public class GameFrame extends JFrame{
     private int width;
     private int height;
     private Container contentPane;
-    private double speed;
     private boolean up;
     private boolean down;
     private boolean left;
@@ -47,10 +46,14 @@ public class GameFrame extends JFrame{
 
     public void setUpAnimation(){
         ActionListener a = new ActionListener(){
-            double speed = 1;
+            double speed = 2;
+            double pSpeed = 1;
             
             @Override
             public void actionPerformed(ActionEvent ae){ 
+                if(gc.getController().getProjectiles().size() != 0){
+                    gc.getController().moveProjectiles();
+                }
                 if(up == true){
                     gc.getPlayer(playerID).moveV(-speed);
                 }
@@ -68,6 +71,19 @@ public class GameFrame extends JFrame{
         };
         Timer aTimer = new Timer(10,a);
         aTimer.start();
+    }
+
+    public void setUpProjectiles(){
+        ActionListener a = new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent ae){
+                if(gc.getController().getProjectiles().size() < 20){
+                    gc.getController().addProjectile();
+                }
+            }
+        };
+        Timer pTimer = new Timer(2000,a);
+        pTimer.start();
     }
 
     public void setUpKeyListener(){
