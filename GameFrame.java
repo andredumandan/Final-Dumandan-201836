@@ -46,14 +46,10 @@ public class GameFrame extends JFrame{
 
     public void setUpAnimation(){
         ActionListener a = new ActionListener(){
-            double speed = 2;
-            double pSpeed = 1;
+            double speed = 4;
             
             @Override
             public void actionPerformed(ActionEvent ae){ 
-                if(gc.getController().getProjectiles().size() != 0){
-                    gc.getController().moveProjectiles();
-                }
                 if(up == true){
                     gc.getPlayer(playerID).moveV(-speed);
                 }
@@ -73,19 +69,6 @@ public class GameFrame extends JFrame{
         aTimer.start();
     }
 
-    public void setUpProjectiles(){
-        ActionListener a = new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent ae){
-                if(gc.getController().getProjectiles().size() < 20){
-                    gc.getController().addProjectile();
-                }
-            }
-        };
-        Timer pTimer = new Timer(2000,a);
-        pTimer.start();
-    }
-
     public void setUpKeyListener(){
         KeyListener kl = new KeyListener(){
             @Override
@@ -97,16 +80,16 @@ public class GameFrame extends JFrame{
                 int keyCode = ke.getKeyCode();
 
                 switch(keyCode){
-                    case KeyEvent.VK_UP :
+                    case KeyEvent.VK_W :
                         up = true;
                         break;
-                    case KeyEvent.VK_DOWN :
+                    case KeyEvent.VK_S :
                         down = true;
                         break;
-                    case KeyEvent.VK_RIGHT :
+                    case KeyEvent.VK_D :
                         right = true;
                         break;
-                    case KeyEvent.VK_LEFT :
+                    case KeyEvent.VK_A :
                         left = true;
                         break;
                 }
@@ -117,16 +100,16 @@ public class GameFrame extends JFrame{
                 int keyCode = ke.getKeyCode();
 
                 switch(keyCode){
-                    case KeyEvent.VK_UP :
+                    case KeyEvent.VK_W :
                         up = false;
                         break;
-                    case KeyEvent.VK_DOWN :
+                    case KeyEvent.VK_S :
                         down = false;
                         break;
-                    case KeyEvent.VK_RIGHT :
+                    case KeyEvent.VK_D :
                         right = false;
                         break;
-                    case KeyEvent.VK_LEFT :
+                    case KeyEvent.VK_A :
                         left = false;
                         break;
                 }

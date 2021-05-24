@@ -3,6 +3,5 @@ public class GameStarter {
         GameFrame g = new GameFrame(800,400);
         g.connectToServer();
         g.setUpGUI();
-        g.setUpProjectiles();
     }
 }

@@ -13,7 +13,7 @@ public class GameCanvas extends JComponent{
     private Color p2 = new Color(255,157,168);
     Player one;
     Player two;
-    Controller c = new Controller();
+    Puck p;
 
 
     public GameCanvas(){
@@ -22,20 +22,31 @@ public class GameCanvas extends JComponent{
     @Override
     protected void paintComponent(Graphics g){
         Graphics2D g2d = (Graphics2D) g;
+        RenderingHints rh = new RenderingHints(
+            RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHints(rh);
         g2d.setColor(bgColor);
         Rectangle2D.Double bg = new Rectangle2D.Double(0, 0, 800, 400);
         g2d.fill(bg);
+        g2d.setColor(Color.WHITE);
+        Rectangle2D.Double line = new Rectangle2D.Double(396, 0, 8, 400);
+        g2d.fill(line);
+        Ellipse2D.Double center = new Ellipse2D.Double(340, 140, 121, 121);
+        g2d.fill(center);
+        g2d.setColor(bgColor);
+        Ellipse2D.Double centerCover = new Ellipse2D.Double(350, 150, 100, 100);
+        g2d.fill(centerCover);
+        p.draw(g2d);
         one.drawSprite(g2d);
         two.drawSprite(g2d);
-        if(c.getProjectiles().size() != 0){
-            c.drawProjectiles(g2d);
-        }
         
     }
 
     public void createSprites(){
-        one = new Player(169,179,42,42,p1);
-        two = new Player(589,179,42,42,p2);
+        one = new Player(169,179,p1);
+        two = new Player(589,179,p2);
+        p = new Puck(382,182);
     }
 
     public Player getPlayer(int playerID){
@@ -56,10 +67,10 @@ public class GameCanvas extends JComponent{
         }
     }
 
-    public Controller getController(){
-        return c;
+    public Puck getPuck(){
+        return p;
     }
-
 }
+
     
 

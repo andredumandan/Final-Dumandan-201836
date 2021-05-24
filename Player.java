@@ -3,19 +3,18 @@ import java.awt.*;
 
 public class Player {
     
-    private double x, y, height, width;
+    private double x, y, size, mass;
     private Color color;
     
-    public Player(double x, double y, double width, double height, Color color){
+    public Player(double x, double y, Color color){
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
         this.color = color;
+        mass = 10;
     }
 
     public void drawSprite(Graphics2D g2d) {
-        Rectangle2D.Double player = new Rectangle2D.Double(x,y,width,height);
+        Ellipse2D.Double player = new Ellipse2D.Double(x,y,42,42);
         g2d.setColor(color);
         g2d.fill(player);
     }
@@ -44,5 +43,7 @@ public class Player {
         return y;
     }
 
-
+    public double getMass(){
+        return mass;
+    }
 }

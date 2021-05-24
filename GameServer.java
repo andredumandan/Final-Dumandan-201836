@@ -12,7 +12,14 @@ public class GameServer {
     private ReadFromClient p2ReadRunnable;
     private WriteToClient p1WriteRunnable;
     private WriteToClient p2WriteRunnable;
-    private double p1X, p1Y, p2X, p2Y;
+    private double p1X, p1Y, p2X, p2Y,puckX,puckY,playerSize,puckSize,playerRadius,puckRadius;
+    boolean p1IsHittingPuck = isHittingPuck(1);
+    boolean p2IsHittingPuck = isHittingPuck(2);
+    boolean p1IsOutOfBounds = isOutOfBounds(1);
+    boolean p2IsOutOfBounds = isOutOfBounds(2);
+    String p1Data = p1X+","+p1Y+","+p1IsHittingPuck+","+p1IsOutOfBounds;
+    String p2Data = p2X+","+p2Y+","+p2IsHittingPuck+","+p2IsOutOfBounds;
+    
 
     public GameServer(){
         System.out.println("======SERVER======");
@@ -22,6 +29,10 @@ public class GameServer {
         p1Y = 179;
         p2X = 589;
         p2Y = 179;
+        playerSize=42;
+        playerRadius=21;
+        puckSize=36;
+        puckRadius=13;
         try {
             ss = new ServerSocket(50301);
         } catch(IOException ex){
@@ -71,6 +82,52 @@ public class GameServer {
         } catch(IOException ex){
             System.out.println("IOException occured at acceptConnections");
         }
+    }
+
+
+    private boolean isHittingPuck(int i) {
+        if (i==1){
+            double distance = Math.sqrt(((p1X - puckX) * (p1X - puckX)) + ((p1Y - puckY) * (p1Y - puckY)));
+            
+            if(distance < playerRadius + puckRadius){
+                System.out.println("COLLISION WITH PUCK");
+                return true;
+            }
+            else{
+                return false;
+            }
+            
+        }
+        else{
+            double distance = Math.sqrt(((p2X - puckX) * (p2X - puckX)) + ((p2Y - puckY) * (p2Y - puckY)));
+
+            if(distance < playerRadius + puckRadius){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }   
+    }
+
+    private boolean isOutOfBounds(int i) {
+        if (i==1){
+            if(p1X < 0 || p1X + playerSize > 396 || p1Y < 0 || p1Y > 400){
+                return true;
+            }
+            else{
+                return false;
+            }
+            
+        }
+        else{
+            if(p2X < 404 || p2X + playerSize > 800 || p2Y < 0 || p2Y > 400){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }   
     }
 
     private class ReadFromClient implements Runnable {
@@ -150,6 +207,7 @@ public class GameServer {
             }
         }
     }
+
 
     public static void main(String[] args){
         GameServer gs = new GameServer();
