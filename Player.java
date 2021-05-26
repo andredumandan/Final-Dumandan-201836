@@ -1,7 +1,7 @@
 import java.awt.geom.*;
 import java.awt.*;
 
-public class Player {
+public class Player implements DrawingObject{
     
     private double x, y, size, mass;
     private Color color;
@@ -13,7 +13,7 @@ public class Player {
         mass = 10;
     }
 
-    public void drawSprite(Graphics2D g2d) {
+    public void draw(Graphics2D g2d) {
         Ellipse2D.Double player = new Ellipse2D.Double(x,y,42,42);
         g2d.setColor(color);
         g2d.fill(player);

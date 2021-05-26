@@ -1,16 +1,11 @@
 import javax.swing.*;
-import java.awt.geom.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.*;
-
 
 public class GameCanvas extends JComponent{
-    
-    private Color bgColor = new Color(255,244,111);
-    private Color p1 = new Color(0,168,219);
-    private Color p2 = new Color(255,157,168);
+
+    private Color p1 = new Color(24,126,230);
+    private Color p2 = new Color(210,24,222);
+    Background bg = new Background();
     Player one;
     Player two;
     Puck p;
@@ -26,20 +21,10 @@ public class GameCanvas extends JComponent{
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
-        g2d.setColor(bgColor);
-        Rectangle2D.Double bg = new Rectangle2D.Double(0, 0, 800, 400);
-        g2d.fill(bg);
-        g2d.setColor(Color.WHITE);
-        Rectangle2D.Double line = new Rectangle2D.Double(396, 0, 8, 400);
-        g2d.fill(line);
-        Ellipse2D.Double center = new Ellipse2D.Double(340, 140, 121, 121);
-        g2d.fill(center);
-        g2d.setColor(bgColor);
-        Ellipse2D.Double centerCover = new Ellipse2D.Double(350, 150, 100, 100);
-        g2d.fill(centerCover);
+        bg.draw(g2d);
         p.draw(g2d);
-        one.drawSprite(g2d);
-        two.drawSprite(g2d);
+        one.draw(g2d);
+        two.draw(g2d);
         
     }
 

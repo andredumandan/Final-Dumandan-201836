@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.geom.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -16,9 +15,21 @@ public class GameFrame extends JFrame{
     private boolean right;
     private GameCanvas gc;
     private Socket socket;
-    private int playerID;
+    private int playerID,p1Score,p2Score;
+    double playerX;
+    double playerY;
     private ReadFromServer rfsRunnable;
     private WriteToServer wtsRunnable;
+    // String playerWriteToServer;
+    // String playerReadFromServer;
+    JLabel scoreLabel;
+    double playerVSpeed, playerHSpeed;
+    double puckVSpeed = 0;
+    double puckHSpeed = 0;
+    double puckX,puckY,playerSize,puckSize,playerRadius,puckRadius;
+    boolean resetPlayers;
+
+
 
     public GameFrame(int width, int height){
         this.width = width;
@@ -28,6 +39,17 @@ public class GameFrame extends JFrame{
         down = false;
         left = false;
         right = false;
+        puckX = 382;
+        puckY = 182;
+        playerSize=42;
+        playerRadius=21;
+        puckSize=36;
+        puckRadius=18;
+        p1Score=0;
+        p2Score=0;
+        scoreLabel = new JLabel(p1Score+"-"+p2Score);
+        resetPlayers = false;
+
     }
 
     public void setUpGUI(){
@@ -35,7 +57,15 @@ public class GameFrame extends JFrame{
         this.setTitle("PLAYER #" + playerID);
         contentPane.setPreferredSize(new Dimension(width,height));
         gc.createSprites();
-        contentPane.add(gc);
+        contentPane.setLayout(new BorderLayout());
+        scoreLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        scoreLabel.setVerticalAlignment(SwingConstants.NORTH);
+        scoreLabel.setFont(new Font("Arial",Font.PLAIN,40));
+        scoreLabel.setForeground(Color.WHITE);
+        scoreLabel.setBackground(Color.BLACK);
+        scoreLabel.setOpaque(true);
+        contentPane.add(scoreLabel,BorderLayout.NORTH);
+        contentPane.add(gc,BorderLayout.CENTER);
         setUpAnimation();
         setUpKeyListener();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -46,22 +76,54 @@ public class GameFrame extends JFrame{
 
     public void setUpAnimation(){
         ActionListener a = new ActionListener(){
-            double speed = 4;
-            
             @Override
             public void actionPerformed(ActionEvent ae){ 
+                scoreLabel.setText(p1Score+"  -  "+p2Score);
                 if(up == true){
-                    gc.getPlayer(playerID).moveV(-speed);
+                    if(gc.getPlayer(playerID).getY() > 0){
+                        playerVSpeed = -4;
+                        gc.getPlayer(playerID).moveV(playerVSpeed);
+                    }
                 }
                 if(down == true){
-                    gc.getPlayer(playerID).moveV(speed);
+                    if(gc.getPlayer(playerID).getY()+42 < 400){
+                        playerVSpeed = 4;
+                        gc.getPlayer(playerID).moveV(playerVSpeed);
+                    }
                 }
                 if(right == true){
-                    gc.getPlayer(playerID).moveH(speed);
+                    if(playerID == 1){
+                        if(gc.getPlayer(playerID).getX() + 42 < 396){
+                            playerHSpeed = 4;  
+                            gc.getPlayer(playerID).moveH(playerHSpeed);
+                        }
+                    }
+                    else{
+                        if(gc.getPlayer(playerID).getX() + 42 < 800){
+                            playerHSpeed = 4;
+                            gc.getPlayer(playerID).moveH(playerHSpeed);
+                        }
+                    }
                 }
                 if(left == true){
-                    gc.getPlayer(playerID).moveH(-speed);
+                    if(playerID == 1){
+                        if(gc.getPlayer(playerID).getX() > 0){
+                            playerHSpeed = -4;
+                            gc.getPlayer(playerID).moveH(playerHSpeed);
+                        }
+                    }
+                    else{
+                        if(gc.getPlayer(playerID).getX() > 404){
+                            playerHSpeed = -4;
+                            gc.getPlayer(playerID).moveH(playerHSpeed);
+                        }
+                    }
+                    
                 }
+                playerX = gc.getPlayer(playerID).getX();
+                playerY = gc.getPlayer(playerID).getY();
+                gc.getPuck().moveH(puckHSpeed);
+                gc.getPuck().moveV(puckVSpeed);
                 gc.repaint();
             }
         };
@@ -156,6 +218,41 @@ public class GameFrame extends JFrame{
                     if(gc.getEnemy(playerID) != null){
                         gc.getEnemy(playerID).setX(dataIn.readDouble());
                         gc.getEnemy(playerID).setY(dataIn.readDouble());
+                        gc.getPuck().setX(dataIn.readDouble());
+                        gc.getPuck().setY(dataIn.readDouble());
+                        p1Score = dataIn.readInt();
+                        p2Score = dataIn.readInt();
+                        resetPlayers = dataIn.readBoolean();
+                        if(resetPlayers == true){
+                            playerHSpeed = 0;
+                            playerVSpeed = 0;
+                            if(playerID == 1){
+                                gc.getPlayer(playerID).setX(169);
+                                gc.getPlayer(playerID).setY(179);
+                                gc.getEnemy(playerID).setX(589);
+                                gc.getEnemy(playerID).setY(179);
+        
+                            }
+                            else{
+                                gc.getEnemy(playerID).setX(169);
+                                gc.getEnemy(playerID).setY(179);
+                                gc.getPlayer(playerID).setX(589);
+                                gc.getPlayer(playerID).setY(179);
+                            }
+                            resetPlayers=false;
+                        }
+                        // playerReadFromServer = dataIn.readUTF();
+                        // System.out.println(playerReadFromServer);
+                        // String delims = "[,]";
+                        // String[] data = playerReadFromServer.split(delims);
+                        // gc.getEnemy(playerID).setX(Double.parseDouble(data[0]));
+                        // gc.getEnemy(playerID).setY(Double.parseDouble(data[1]));
+                        // if (playerID == 1){
+                        //     p1IsHittingPuck = Boolean.parseBoolean(data[2]);
+                        // }
+                        // else{
+                        //     p2IsHittingPuck = Boolean.parseBoolean(data[2]);
+                        // }
                     }
                 }
             } catch(IOException ex){
@@ -180,7 +277,6 @@ public class GameFrame extends JFrame{
     }
 
     private class WriteToServer implements Runnable{
-
         private DataOutputStream dataOut;
 
         public WriteToServer(DataOutputStream dataOut){
@@ -190,14 +286,19 @@ public class GameFrame extends JFrame{
 
         @Override
         public void run() {
+            // if(gc.getPlayer(playerID) != null){
+            //     playerWriteToServer = playerX +","+playerY;
+            // }
             try {
                 while(true){
                     if(gc.getPlayer(playerID) != null){
                         dataOut.writeDouble(gc.getPlayer(playerID).getX());
                         dataOut.writeDouble(gc.getPlayer(playerID).getY());
+                        dataOut.writeDouble(playerHSpeed);
+                        dataOut.writeDouble(playerVSpeed);
+                        // dataOut.writeUTF(playerWriteToServer);
                         dataOut.flush();
                     }
-                    
                     try{
                         Thread.sleep(25);
                     } catch(InterruptedException ex){

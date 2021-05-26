@@ -1,8 +1,7 @@
-
 import java.awt.geom.*;
 import java.awt.*;
 
-public class Puck {
+public class Puck implements DrawingObject{
     
     double x,y,size,mass;
     public Puck(double x, double y){
@@ -18,12 +17,20 @@ public class Puck {
         g2d.fill(p);
     }
 
-    public void moveH(int velocity){
+    public void moveH(double velocity){
         x+=velocity;
     }
 
-    public void moveV(int velocity){
+    public void moveV(double velocity){
         y+=velocity;
+    }
+    
+    public void setX(double i){
+        x = i;
+    }
+
+    public void setY(double i){
+        y = i;
     }
 
     public double getX(){
@@ -37,4 +44,5 @@ public class Puck {
     public double getMass(){
         return mass;
     }
+
 }
