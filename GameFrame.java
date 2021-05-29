@@ -5,7 +5,6 @@ import java.io.*;
 import java.net.*;
 
 public class GameFrame extends JFrame{
-
     private int width;
     private int height;
     private Container contentPane;
@@ -28,8 +27,10 @@ public class GameFrame extends JFrame{
     double puckHSpeed = 0;
     double puckX,puckY,playerSize,puckSize,playerRadius,puckRadius;
     boolean resetPlayers;
+    boolean scoreAudioOpen;
 
-
+    String ip;
+    int port;
 
     public GameFrame(int width, int height){
         this.width = width;
@@ -39,6 +40,7 @@ public class GameFrame extends JFrame{
         down = false;
         left = false;
         right = false;
+        scoreAudioOpen = false;
         puckX = 382;
         puckY = 182;
         playerSize=42;
@@ -47,9 +49,8 @@ public class GameFrame extends JFrame{
         puckRadius=18;
         p1Score=0;
         p2Score=0;
-        scoreLabel = new JLabel(p1Score+"-"+p2Score);
+        scoreLabel = new JLabel(p1Score+"  -  "+p2Score);
         resetPlayers = false;
-
     }
 
     public void setUpGUI(){
@@ -86,7 +87,7 @@ public class GameFrame extends JFrame{
                     }
                 }
                 if(down == true){
-                    if(gc.getPlayer(playerID).getY()+42 < 400){
+                    if(gc.getPlayer(playerID).getY() + 42 < 400){
                         playerVSpeed = 4;
                         gc.getPlayer(playerID).moveV(playerVSpeed);
                     }
@@ -145,7 +146,8 @@ public class GameFrame extends JFrame{
                     case KeyEvent.VK_W :
                         up = true;
                         break;
-                    case KeyEvent.VK_S :
+                    
+                        case KeyEvent.VK_S :
                         down = true;
                         break;
                     case KeyEvent.VK_D :
@@ -164,15 +166,19 @@ public class GameFrame extends JFrame{
                 switch(keyCode){
                     case KeyEvent.VK_W :
                         up = false;
+                        playerVSpeed = 0;
                         break;
                     case KeyEvent.VK_S :
                         down = false;
+                        playerVSpeed = 0;
                         break;
                     case KeyEvent.VK_D :
                         right = false;
+                        playerHSpeed = 0;
                         break;
                     case KeyEvent.VK_A :
                         left = false;
+                        playerHSpeed = 0;
                         break;
                 }
             }
@@ -184,6 +190,7 @@ public class GameFrame extends JFrame{
     public void connectToServer(){
         try{
             socket = new Socket("localhost",50301);
+            // socket = new Socket(ip,port);
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             playerID = in.readInt();
@@ -202,10 +209,15 @@ public class GameFrame extends JFrame{
         }
     }
 
+    public void setUpServerIP(String ip, int port){
+        this.ip = ip;
+        this.port = port;
+
+    }
+
     private class ReadFromServer implements Runnable{
 
         private DataInputStream dataIn;
-
         public ReadFromServer(DataInputStream dataIn){
             this.dataIn = dataIn;
             System.out.println("RFS Runnable created.");
@@ -216,12 +228,7 @@ public class GameFrame extends JFrame{
             try{
                 while(true){
                     if(gc.getEnemy(playerID) != null){
-                        gc.getEnemy(playerID).setX(dataIn.readDouble());
-                        gc.getEnemy(playerID).setY(dataIn.readDouble());
-                        gc.getPuck().setX(dataIn.readDouble());
-                        gc.getPuck().setY(dataIn.readDouble());
-                        p1Score = dataIn.readInt();
-                        p2Score = dataIn.readInt();
+                        //Audio https://www.youtube.com/watch?v=cB_CwY9dhrA
                         resetPlayers = dataIn.readBoolean();
                         if(resetPlayers == true){
                             playerHSpeed = 0;
@@ -241,6 +248,12 @@ public class GameFrame extends JFrame{
                             }
                             resetPlayers=false;
                         }
+                        gc.getEnemy(playerID).setX(dataIn.readDouble());
+                        gc.getEnemy(playerID).setY(dataIn.readDouble());
+                        gc.getPuck().setX(dataIn.readDouble());
+                        gc.getPuck().setY(dataIn.readDouble());
+                        p1Score = dataIn.readInt();
+                        p2Score = dataIn.readInt();
                         // playerReadFromServer = dataIn.readUTF();
                         // System.out.println(playerReadFromServer);
                         // String delims = "[,]";
@@ -256,7 +269,7 @@ public class GameFrame extends JFrame{
                     }
                 }
             } catch(IOException ex){
-                System.out.println("IOException from RFC run()");
+                System.out.println("IOException from RFS run()");
             }
         }
         
@@ -305,9 +318,11 @@ public class GameFrame extends JFrame{
                         System.out.println("InterruptedException from WTS run()");
                     }
                 }
-            } catch (IOException ex){
+            } 
+            catch (IOException ex){
                 System.out.println("IOException from WTS run()");
             }
         }
     }
+
 }

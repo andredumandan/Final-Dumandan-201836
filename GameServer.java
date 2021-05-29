@@ -33,8 +33,8 @@ public class GameServer {
         puckX = 382;
         puckY = 182;
         playerSize=42;
-        playerRadius=21;
-        puckSize=36;
+        playerRadius=23;
+        puckSize=38;
         puckRadius=18;
         p1Score = 0;
         p2Score = 0;
@@ -98,53 +98,28 @@ public class GameServer {
         
             @Override
             public void actionPerformed(ActionEvent ae) {
-                p1IsHittingPuck = isHittingPuck(1);
-                p2IsHittingPuck = isHittingPuck(2);
+                resetPlayers = false;
                 p1Scored = playerScored(1);
                 p2Scored = playerScored(2);
+                p1IsHittingPuck = isHittingPuck(1);
+                p2IsHittingPuck = isHittingPuck(2);
                 
-                if (p1IsHittingPuck){
-                    double xDif = p1X - puckX;
-                    double yDif = p1Y - puckY;
-                    double distance = Math.sqrt((puckX-p1X)*(puckX-p1X) + (puckY-p1Y)*(puckY-p1Y));
-                    double xCollisionNorm = xDif/distance;
-                    double yCollisionNorm = yDif/distance;
-                    double xRelativeVelocity = p1HSpeed - puckHSpeed;
-                    double yRelativeVelocity = p1VSpeed - puckVSpeed;
-                    double speed = xRelativeVelocity * xCollisionNorm + yRelativeVelocity * yCollisionNorm;
-                    puckHSpeed = (speed * xCollisionNorm);
-                    puckVSpeed = (speed * yCollisionNorm);
-
-
+                if (p1IsHittingPuck && p1VSpeed != 0  || p1IsHittingPuck && p1HSpeed != 0){
+                    puckVSpeed = (puckVSpeed * (5 - 8) + (2 * 8 * p1VSpeed)) / (8 + 5); //second ball = puck
+                    puckHSpeed = (puckHSpeed * (5 - 8) + (2 * 8 * p1HSpeed)) / (8 + 5); //first ball = player
+                    System.out.println("puckVSpeed: "+puckVSpeed+"\npuckHSpeed: "+puckHSpeed+"\np1VSpeed: "+p1VSpeed+"\np1HSpeed: "+p1HSpeed);
                 }
-                else if (p2IsHittingPuck){
-                    double xDif = p2X - puckX;
-                    double yDif = p2Y - puckY;
-                    double distance = Math.sqrt((puckX-p2X)*(puckX-p2X) + (puckY-p2Y)*(puckY-p2Y));
-                    double xCollisionNorm = xDif/distance;
-                    double yCollisionNorm = yDif/distance;
-                    double xRelativeVelocity = p1HSpeed - puckHSpeed;
-                    double yRelativeVelocity = p1VSpeed - puckVSpeed;
-                    double speed = xRelativeVelocity * xCollisionNorm + yRelativeVelocity * yCollisionNorm;
-                    puckHSpeed = (speed * xCollisionNorm);
-                    puckVSpeed = (speed * yCollisionNorm);
 
+                if (p2IsHittingPuck && p2VSpeed != 0  || p2IsHittingPuck && p2HSpeed != 0){
+                    puckVSpeed = (puckVSpeed * (5 - 8) + (2 * 8 * p2VSpeed)) / (8 + 5); //second ball = puck
+                    puckHSpeed = (puckHSpeed * (5 - 8) + (2 * 8 * p2HSpeed)) / (8 + 5); //first ball = player
                 }
-                // if (p1IsHittingPuck && p1VSpeed != 0 && p1HSpeed != 0){
-                //     puckVSpeed = (puckVSpeed * (5 - 8) + (2 * 8 * p1VSpeed)) / (8 + 5); //second ball = puck
-                //     puckHSpeed = (puckHSpeed * (5 - 8) + (2 * 8 * p1HSpeed)) / (8 + 5); //first ball = player
-                // }
 
-                // else if (p2IsHittingPuck && p2VSpeed != 0 && p2HSpeed != 0){
-                //     puckVSpeed = (puckVSpeed * (5 - 8) + (2 * 8 * p2VSpeed)) / (8 + 5); //second ball = puck
-                //     puckHSpeed = (puckHSpeed * (5 - 8) + (2 * 8 * p2HSpeed)) / (8 + 5); //first ball = player
-                // }
-
-                if (puckX+36 >= 800 || puckX <= 0){
+                if (puckX+puckSize >= 800 || puckX <= 0){
                     puckHSpeed = puckHSpeed * -1;
                 }
 
-                if(puckY+36 >= 400 || puckY <= 0){
+                if(puckY+puckSize >= 400 || puckY <= 0){
                     puckVSpeed = puckVSpeed * -1;
                 }
                 
@@ -159,15 +134,13 @@ public class GameServer {
                 }
                 puckX += puckHSpeed;
                 puckY += puckVSpeed;
-
+                
                 if(p2Scored==true){
                     p2Score+=1;
                     puckX = 382;
                     puckY = 182;
                     puckVSpeed = 0;
                     puckHSpeed = 0;
-                    resetPlayers = true;
-                    resetPlayers = false;
                 }
                 if(p1Scored==true){
                     p1Score+=1;
@@ -175,11 +148,8 @@ public class GameServer {
                     puckY = 182;
                     puckVSpeed = 0;
                     puckHSpeed = 0;
-                    resetPlayers = true;
-                    resetPlayers = false;
                 }
 
-  
             }
             
         };
@@ -193,9 +163,7 @@ public class GameServer {
         if (i==1){
             double xDif = p1X - puckX;
             double yDif = p1Y - puckY;
-            
             if ((xDif*xDif + yDif*yDif) <= radiiSum*radiiSum){
-                System.out.println("P1 COLLIDING WITH PUCK");
                 return true;
             }
             return false;
@@ -204,7 +172,6 @@ public class GameServer {
             double xDif = p2X - puckX;
             double yDif = p2Y - puckY;
             if ((xDif*xDif + yDif*yDif) <= radiiSum*radiiSum){
-                System.out.println("P2 COLLIDING WITH PUCK");
                 return true;
             }
             return false;
@@ -215,6 +182,7 @@ public class GameServer {
         if (i == 2){
             if (puckX < 4 && puckY+18 > 148 && puckY+18 < 254){
                 System.out.println("Player 2 Scored");
+                resetPlayers = true;
                 return true;
             }
             else{
@@ -224,6 +192,7 @@ public class GameServer {
         else{
             if(puckX+36 > 796 && puckY+18 > 148 && puckY+18 < 254){
                 System.out.println("Player 1 Scored");
+                resetPlayers = true;
                 return true;
             }
             else{
@@ -294,24 +263,26 @@ public class GameServer {
                 while(true){
                     if(playerID == 1){
                         // dataOut.writeUTF(p2DataWriteToClient);
+                        dataOut.writeBoolean(resetPlayers);
                         dataOut.writeDouble(p2X);
                         dataOut.writeDouble(p2Y);
                         dataOut.writeDouble(puckX);
                         dataOut.writeDouble(puckY);
                         dataOut.writeInt(p1Score);
                         dataOut.writeInt(p2Score);
-                        dataOut.writeBoolean(resetPlayers);
+         
                         dataOut.flush();
                     }
                     else{
                         // dataOut.writeUTF(p1DataWriteToClient);
+                        dataOut.writeBoolean(resetPlayers);
                         dataOut.writeDouble(p1X);
                         dataOut.writeDouble(p1Y);
                         dataOut.writeDouble(puckX);
                         dataOut.writeDouble(puckY);
                         dataOut.writeInt(p1Score);
                         dataOut.writeInt(p2Score);
-                        dataOut.writeBoolean(resetPlayers);
+    
                         dataOut.flush();
                     }
                     try{

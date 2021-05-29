@@ -4,7 +4,9 @@ import java.awt.*;
 public class GameCanvas extends JComponent{
 
     private Color p1 = new Color(24,126,230);
+    private Color p1InnerColor = new Color(15,81,148);
     private Color p2 = new Color(210,24,222);
+    private Color p2InnerColor = new Color(134,17,142);
     Background bg = new Background();
     Player one;
     Player two;
@@ -29,9 +31,28 @@ public class GameCanvas extends JComponent{
     }
 
     public void createSprites(){
-        one = new Player(169,179,p1);
-        two = new Player(589,179,p2);
+        one = new Player(169,179,p1,p1InnerColor);
+        two = new Player(589,179,p2,p2InnerColor);
         p = new Puck(382,182);
+    }
+
+    public void changeColor(boolean isMoving, int playerID){
+        if(playerID == 1){
+            if (isMoving == true){
+                p1 = new Color (24,126,230);
+            }
+            else{
+                p1 = new Color(105,164,224);
+            }
+        }
+       else{
+        if (isMoving == true){
+            p2 = new Color (210,24,222);
+        }
+        else{
+            p2 = new Color (219,132,224);
+        }
+       }
     }
 
     public Player getPlayer(int playerID){
