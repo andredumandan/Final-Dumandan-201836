@@ -1,14 +1,47 @@
+/**
+	
+    This java files is a DrawingObject that draws the Air Hockey Field. It uses the draw method from the DrawingObject interface and utilizes a Graphics2D object to draw the shapes.
+
+	@author Andre Matthew G. Dumandan (201836)
+	@version May 16, 2021
+**/
+
+/*
+	I have not discussed the Java language code in my program 
+	with anyone other than my instructor or the teaching assistants 
+	assigned to this course.
+
+	I have not used Java language code obtained from another student, 
+	or any other unauthorized source, either modified or unmodified.
+
+	If any Java language code or documentation used in my program 
+	was obtained from another source, such as a textbook or website, 
+	that has been clearly noted with a proper citation in the comments 
+	of my program.
+*/
+
 import java.awt.*;
 import java.awt.geom.*;
 
 public class Background implements DrawingObject{
-    private Color bgColor = new Color(232,231,225);
-    private Color centerColor = new Color(240,60,60);
+    private Color bgColor;
+    private Color centerColor;
 
+    /**
+     * Initializes the color instances used for the Background
+     */
     public Background(){
-
+        bgColor = new Color(232,231,225);
+        centerColor = new Color(240,60,60);
     }
 
+    
+    
+    /** 
+     * Draws the background of the Air Hockey Field
+     * @param g2d - accepts a Graphics2D object that will be used to draw and fill shapes
+     */
+    @Override
     public void draw(Graphics2D g2d){
         g2d.setColor(bgColor);
         Rectangle2D.Double bg = new Rectangle2D.Double(0, 0, 800, 400);

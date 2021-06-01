@@ -1,3 +1,24 @@
+/**
+	
+    This is the Server program that contains the ServerSocket. This program sends, receives, and modifies data from two clients for the game.
+
+	@author Andre Matthew G. Dumandan (201836)
+	@version May 16, 2021
+**/
+
+/*
+	I have not discussed the Java language code in my program 
+	with anyone other than my instructor or the teaching assistants 
+	assigned to this course.
+
+	I have not used Java language code obtained from another student, 
+	or any other unauthorized source, either modified or unmodified.
+
+	If any Java language code or documentation used in my program 
+	was obtained from another source, such as a textbook or website, 
+	that has been clearly noted with a proper citation in the comments 
+	of my program.
+*/
 import java.io.*;
 import java.net.*;
 import java.awt.event.*;
@@ -5,23 +26,25 @@ import javax.swing.*;
 
 public class GameServer {
     
+    private int p1Score,p2Score;
+    private int numPlayers, maxPlayers;
+    private double p1X, p1Y, p2X, p2Y, p1VSpeed,p1HSpeed,p2VSpeed,p2HSpeed,playerRadius;
+    private double puckX,puckY,puckHSpeed,puckVSpeed,puckSize,puckRadius;
+    private boolean p1IsHittingPuck,p2IsHittingPuck,p1Scored,p2Scored,resetPlayers,p1PlayAgain,p2PlayAgain;
     private ServerSocket ss;
     private Socket p1Socket;
     private Socket p2Socket;
-    private int numPlayers;
-    private int maxPlayers;
     private ReadFromClient p1ReadRunnable;
     private ReadFromClient p2ReadRunnable;
     private WriteToClient p1WriteRunnable;
     private WriteToClient p2WriteRunnable;
-    private double p1X, p1Y, p2X, p2Y,puckX,puckY,puckHSpeed,puckVSpeed,p1VSpeed,p1HSpeed,p2VSpeed,p2HSpeed,playerSize,puckSize,playerRadius,puckRadius;
-    String dataFromClient;
-    private int p1Score,p2Score;
-    boolean p1IsHittingPuck,p2IsHittingPuck,p1Scored,p2Scored,resetPlayers;
-    
 
+    
+    /**
+     * Initializes the instance fields for the GameServer.
+     */
     public GameServer(){
-        System.out.println("======SERVER======");
+        System.out.println("====== GAME SERVER ======");
         numPlayers = 0;
         maxPlayers = 2;
         puckHSpeed = 0;
@@ -32,7 +55,6 @@ public class GameServer {
         p2Y = 179;
         puckX = 382;
         puckY = 182;
-        playerSize=42;
         playerRadius=23;
         puckSize=38;
         puckRadius=18;
@@ -48,6 +70,9 @@ public class GameServer {
         }
     }
 
+    /**
+     * A void method that that creates a socket for each player that connects.  It assigns them a player number which helps determine which player they can control.
+     */
     public void acceptConnections(){
         try{
             System.out.println("Waiting for connections...");
@@ -56,7 +81,6 @@ public class GameServer {
                 Socket s = ss.accept();
                 DataInputStream in = new DataInputStream(s.getInputStream());
                 DataOutputStream out = new DataOutputStream(s.getOutputStream());
-
                 numPlayers++;
                 out.writeInt(numPlayers);
                 System.out.println("Player #" + numPlayers + " has connected.");
@@ -92,7 +116,9 @@ public class GameServer {
         }
     }
 
-    
+    /**
+     * A void methos that sets up a timer that continuously determines the position of the Puck as well as the movement.
+     */
     public void setUpPuckMovement(){
         ActionListener a = new ActionListener(){
         
@@ -103,16 +129,22 @@ public class GameServer {
                 p2Scored = playerScored(2);
                 p1IsHittingPuck = isHittingPuck(1);
                 p2IsHittingPuck = isHittingPuck(2);
+
+                if(p1PlayAgain == true && p2PlayAgain == true){
+                    p1Score = 0;
+                    p2Score = 0;
+                    p1PlayAgain = false;
+                    p2PlayAgain = false;
+                }
                 
                 if (p1IsHittingPuck && p1VSpeed != 0  || p1IsHittingPuck && p1HSpeed != 0){
-                    puckVSpeed = (puckVSpeed * (5 - 8) + (2 * 8 * p1VSpeed)) / (8 + 5); //second ball = puck
-                    puckHSpeed = (puckHSpeed * (5 - 8) + (2 * 8 * p1HSpeed)) / (8 + 5); //first ball = player
-                    System.out.println("puckVSpeed: "+puckVSpeed+"\npuckHSpeed: "+puckHSpeed+"\np1VSpeed: "+p1VSpeed+"\np1HSpeed: "+p1HSpeed);
+                    puckVSpeed = (puckVSpeed * (5 - 8) + (2 * 8 * p1VSpeed)) / (8 + 5);
+                    puckHSpeed = (puckHSpeed * (5 - 8) + (2 * 8 * p1HSpeed)) / (8 + 5);
                 }
 
                 if (p2IsHittingPuck && p2VSpeed != 0  || p2IsHittingPuck && p2HSpeed != 0){
-                    puckVSpeed = (puckVSpeed * (5 - 8) + (2 * 8 * p2VSpeed)) / (8 + 5); //second ball = puck
-                    puckHSpeed = (puckHSpeed * (5 - 8) + (2 * 8 * p2HSpeed)) / (8 + 5); //first ball = player
+                    puckVSpeed = (puckVSpeed * (5 - 8) + (2 * 8 * p2VSpeed)) / (8 + 5);
+                    puckHSpeed = (puckHSpeed * (5 - 8) + (2 * 8 * p2HSpeed)) / (8 + 5); 
                 }
 
                 if (puckX+puckSize >= 800 || puckX <= 0){
@@ -124,13 +156,13 @@ public class GameServer {
                 }
                 
                 if (puckHSpeed > 0 || puckVSpeed > 0){
-                    puckVSpeed -= 0.02;
-                    puckHSpeed -= 0.02;
+                    puckVSpeed -= 0.01;
+                    puckHSpeed -= 0.01;
                 }
   
                 if (puckHSpeed < 0 || puckVSpeed < 0){
-                    puckVSpeed += 0.02;
-                    puckHSpeed += 0.02;
+                    puckVSpeed += 0.01;
+                    puckHSpeed += 0.01;
                 }
                 puckX += puckHSpeed;
                 puckY += puckVSpeed;
@@ -153,11 +185,17 @@ public class GameServer {
             }
             
         };
-        Timer puckTimer = new Timer(10,a);
+        Timer puckTimer = new Timer(5,a);
         puckTimer.start();
         
     }
 
+    
+    /** 
+     * Detects collision between a player and the puck.
+     * @param i - accepts an integer which is the playerID of the user.
+     * @return boolean - returns true if the playerID is hitting the puck.
+     */
     public boolean isHittingPuck(int i){
         double radiiSum = playerRadius + puckRadius;
         if (i==1){
@@ -178,9 +216,15 @@ public class GameServer {
         }
     }
 
+    
+    /** 
+     * Determines if a player's goal has been compromised by the puck.
+     * @param i - accepts an integer that determines which goal the puck hit.
+     * @return boolean - returns true if the Puck hits the goal of one of the players.
+     */
     public boolean playerScored(int i){
         if (i == 2){
-            if (puckX < 4 && puckY+18 > 148 && puckY+18 < 254){
+            if (puckX < 4 && puckY+18 > 148 && puckY+puckRadius < 254){
                 System.out.println("Player 2 Scored");
                 resetPlayers = true;
                 return true;
@@ -190,7 +234,7 @@ public class GameServer {
             }
         }
         else{
-            if(puckX+36 > 796 && puckY+18 > 148 && puckY+18 < 254){
+            if(puckX+puckSize > 796 && puckY+puckRadius > 148 && puckY+puckRadius < 254){
                 System.out.println("Player 1 Scored");
                 resetPlayers = true;
                 return true;
@@ -201,6 +245,9 @@ public class GameServer {
         }
     }
 
+    /**
+     * An inner class that implements Runnable. It creates a thread the continuously reads data from both player clients.
+     */
     private class ReadFromClient implements Runnable {
         private int playerID;
         private DataInputStream dataIn;
@@ -216,38 +263,32 @@ public class GameServer {
             try{
                 while(true){
                     if(playerID == 1){
-                        // dataFromClient = dataIn.readUTF();
-                        // System.out.println(dataFromClient);
-                        // String delims = "[,]";
-                        // String[] data = dataFromClient.split(delims);
-                        // p1X = Double.parseDouble(data[0]);
-                        // p1Y = Double.parseDouble(data[1]);
                         p1X = dataIn.readDouble();
                         p1Y = dataIn.readDouble();
                         p1HSpeed=dataIn.readDouble();
                         p1VSpeed=dataIn.readDouble();
+                        p1PlayAgain=dataIn.readBoolean();
                     }
                     else{
-                        // dataFromClient = dataIn.readUTF();
-                        // String[] data = dataFromClient.split(",");
-                        // p2X = Double.parseDouble(data[0]);
-                        // p2Y = Double.parseDouble(data[1]);
                         p2X = dataIn.readDouble();
                         p2Y = dataIn.readDouble();
                         p2HSpeed=dataIn.readDouble();
                         p2VSpeed=dataIn.readDouble();
+                        p2PlayAgain=dataIn.readBoolean();
                     }
                 }
             } catch(IOException ex){
                 System.out.println("IOException from RFC run()");
+                System.exit(0);
             }
             
         }
     }
 
+    /**
+     * An inner class that implements Runnable. It continuously writes data to both clients.
+     */
     private class WriteToClient implements Runnable {
-        // String p1DataWriteToClient = p1X+","+p1Y+","+p1IsHittingPuck;
-        // String p2DataWriteToClient = p2X+","+p2Y+","+p2IsHittingPuck;
         private int playerID;
         private DataOutputStream dataOut;
 
@@ -262,19 +303,16 @@ public class GameServer {
             try{
                 while(true){
                     if(playerID == 1){
-                        // dataOut.writeUTF(p2DataWriteToClient);
-                        dataOut.writeBoolean(resetPlayers);
+                        dataOut.writeBoolean(playerScored(1)||playerScored(2));
                         dataOut.writeDouble(p2X);
                         dataOut.writeDouble(p2Y);
                         dataOut.writeDouble(puckX);
                         dataOut.writeDouble(puckY);
                         dataOut.writeInt(p1Score);
                         dataOut.writeInt(p2Score);
-         
                         dataOut.flush();
                     }
                     else{
-                        // dataOut.writeUTF(p1DataWriteToClient);
                         dataOut.writeBoolean(resetPlayers);
                         dataOut.writeDouble(p1X);
                         dataOut.writeDouble(p1Y);
@@ -282,17 +320,18 @@ public class GameServer {
                         dataOut.writeDouble(puckY);
                         dataOut.writeInt(p1Score);
                         dataOut.writeInt(p2Score);
-    
                         dataOut.flush();
                     }
                     try{
-                        Thread.sleep(25);
+                        Thread.sleep(8);
                     } catch(InterruptedException ex){
                         System.out.println("InterruptedException from WTC run()");
+                        System.exit(0);
                     }
                 }
             } catch(IOException ex){
-                System.out.println("IOException from RFC run()");
+                System.out.println("IOException from WTC run()");
+                System.exit(0);
             }
             
         }
@@ -303,6 +342,7 @@ public class GameServer {
             }
             catch(IOException ex){
                 System.out.println("IOException from sendStartMsg()");
+                System.exit(0);
             }
         }
     }
@@ -310,6 +350,11 @@ public class GameServer {
 
 
 
+    
+    /** 
+     * Containes the main method for the server. Implements the methods in order to set up the server.
+     * @param args
+     */
     public static void main(String[] args){
         GameServer gs = new GameServer();
         gs.acceptConnections();
